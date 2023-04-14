@@ -11,7 +11,12 @@ constraint forall(i in 1..n)(
 );
 
 array[0..n,0..n] of int: distances;
-
+array[1..m, 1..n] of bool: items_in_courier;
+constraint forall(c in 1..m) (
+    sum(i in 1..n)(items_in_courier[c,i] * sizes[i]) <= load_sizes[c]
+    %sum of the sizes of the items present in that courier is less than            
+    %or equal to the load size of that courier
+); 
 
 
 
