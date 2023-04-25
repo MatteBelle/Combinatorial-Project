@@ -1,0 +1,14 @@
+{
+    "openFiles": [
+        "MCP_CP.mzn",
+        "Data_CP.dzn"
+    ],
+    "openTab": 0,
+    "projectFiles": [
+        "Data_CP.dzn",
+        "MCP_CP.mzn"
+    ],
+    "selectedBuiltinConfigId": "org.gecode.gecode",
+    "selectedBuiltinConfigVersion": "6.3.0",
+    "version": 106
+}
