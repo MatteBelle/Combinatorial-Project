@@ -9,13 +9,15 @@ constraint n>=m;
 
 array[COURIERS] of int: load_sizes; %each courier has a load size li
 array[ITEMS] of var int: sizes; %each item has a size sj
+constraint sum(s in ITEMS) (sizes[s]) <= sum(ls in COURIERS) (load_sizes[ls]);
+
 constraint forall(i in ITEMS)(
     sizes[i] > 0); 
     %each item has a size sj
 
 set of int: DISTRIB_POINTS = 1..n+1;
 array[DISTRIB_POINTS,DISTRIB_POINTS] of int: distances;
-array[COURIERS, ITEMS] of bool: items_in_courier;
+array[COURIERS, ITEMS] of var 0..1: items_in_courier;
 constraint forall(c in COURIERS) (
     sum(i in ITEMS)(items_in_courier[c,i] * sizes[i]) <= load_sizes[c]); 
     %sum of the sizes of the items present in that courier is less than            
@@ -24,8 +26,14 @@ constraint forall(c in COURIERS) (
 %Each item is delivered exactly by one courier
 constraint forall(i in ITEMS)(
     sum(c in COURIERS)(items_in_courier[c,i]) == 1);
+
+%Ogni corriere deve prendere su almeno un pacco
+constraint forall(c in COURIERS) (
+    sum(i in ITEMS) (items_in_courier[c,i]) >=1);
     
-%TODO Ogni corriere deve prendere su almeno un pacco
+solve satisfy;
+
+
 
 
 
