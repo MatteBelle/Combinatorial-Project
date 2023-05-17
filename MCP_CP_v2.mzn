@@ -1,55 +1,56 @@
 include "globals.mzn";
+%VERSION NUMBER: 2 
+%To achieve a fair division among drivers, the objective is to minimize the maximum distance travelled by any courier. 
 
+%VARIABLES DEFINITION:
 int: m; %m couriers
 set of int: COURIERS = 1..m;
 int: n; %n items
 set of int: ITEMS = 1..n;
-constraint n>=m;
-% To achieve a fair division among drivers, the objective is to minimize the maximum distance travelled by any courier. 
-
-array[COURIERS] of int: load_sizes; %each courier has a load size li
-array[ITEMS] of int: sizes; %each item has a size sj
-constraint sum(s in ITEMS) (sizes[s]) <= sum(ls in COURIERS) (load_sizes[ls]);
-constraint forall(i in ITEMS)(
-    sizes[i] > 0); 
-    %each item has a size sj
-
+array[COURIERS] of int: load_sizes; %Each courier has a load size li
+array[ITEMS] of int: sizes; %Each item has a size sj
 set of int: DISTRIB_POINTS = 1..n+1;
-set of int: PATH = 1..(n-(m-1)+2);
+int: max_path_length = (n-(m-1)+2); 
+%Max path length is given by:
+%  - the fact that the first and last destination is the origin point (+2)
+%  - every courier must have atleast one item -> if one has all the others it has max n-(m-1)items inside
+set of int: PATH = 1..max_path_length;
 array[DISTRIB_POINTS,DISTRIB_POINTS] of int: distances;
-array[COURIERS, PATH] of var 1..n+1: paths; % n - (m-1) + 2 
-constraint all_different_except(paths[COURIERS,ITEMS],{n+1});
-constraint forall(c in COURIERS) (
-  paths[c,1] = n+1 /\ paths[c,(n-(m-1)+2)]=n+1);
-constraint forall(c in COURIERS) (
-  forall(i in 2..n-1) (paths[c,i] < n+2));
-var int: items_total = sum(ITEMS);
-var int: matrix_total = sum(c in COURIERS,i in ITEMS)(paths[c,i]);
-var int: matrix_empty_total = m*((n+1)*(n-(m-1)+2));
-var int: row_empty = (n+1)*(n-(m-1)+2);
+array[COURIERS, PATH] of var 1..n+1: paths; %paths is a matrix containing for each courier its path in the format [n+1,X,X,X,...,n+1]
+var int: items_total = sum(ITEMS); %Sum of items (ex. n=7 items_total = 1+2+...+7)
+var int: matrix_total = sum(c in COURIERS,p in PATH)(paths[c,p]); %Total sum of all matrix elements
+var int: row_empty = (n+1)*max_path_length; %Total sum of a row if each element is n+1
+var int: matrix_empty_total = m*row_empty; %Total sum of all matrix elements if it's "empty" -> all elements are equal to n+ 
+var int: total_distance = sum(c in COURIERS)(sum(p in 1..(n-(m-1)+1))(distances[paths[c,p],paths[c,p+1]]));
+%Sum of all the distances traveled by the couriers 
+array[COURIERS] of var int: courier_distances; %Array containing the distance traveled by each courier
+array[1..1,1..2] of var int: obj_func = [| max(courier_distances), total_distance|]; 
+%Objective function to minimize, in this case it's the sum of the maximum distance done by one cuorier and the total distance
 
-constraint matrix_total = matrix_empty_total - items_total;
+%CONSTRAINTS DEFINITION:
+constraint n>=m;
+constraint sum(s in ITEMS) (sizes[s]) <= sum(ls in COURIERS) (load_sizes[ls]); %Sum of item sizes cannot be bigger than total load size
+constraint forall(i in ITEMS)(
+    sizes[i] > 0);  %Each item has a size sj
+constraint all_different_except(paths[COURIERS,PATH],{n+1}); %Each item is delivered at most by one courier, only n+1 value can be repeated as it's used as a filler element
 constraint forall(c in COURIERS) (
-  sum(p in PATH)(paths[c,p]) < row_empty);
-  
+  paths[c,1] = n+1 /\ paths[c,(n-(m-1)+2)]=n+1); %First element and last element in path is the origin (n+1)
+constraint matrix_total = matrix_empty_total - items_total; %Each item distrib_point must be present in the path matrix
 constraint forall(c in COURIERS) (
-  sum(p in PATH where paths[c,p]<n+1)(sizes[paths[c,p]]) <= load_sizes[c]);
-var int: c1_size = sum(p in PATH where paths[1,p]<n+1)(sizes[paths[1,p]]);
+  sum(p in PATH)(paths[c,p]) < row_empty); %Each courier must deliver atleast one item
+constraint forall(c in COURIERS) (
+  sum(p in PATH where paths[c,p]<n+1)(sizes[paths[c,p]]) <= load_sizes[c]); %Each courier's items sizes must not excede his load size
+var int: c1_size = sum(p in PATH where paths[1,p]<n+1)(sizes[paths[1,p]]); %remove
+constraint forall(c in COURIERS) (courier_distances[c] = sum(p in 1..(n-(m-1)+1))(distances[paths[c,p],paths[c,p+1]])); 
+%Each cuourier distance is given by the sum of the single distances between distib_points and origin point
 
-var int: result = sum(c in COURIERS)(sum(p in 1..(n-(m-1)+1))(distances[paths[c,p],paths[c,p+1]]));
+solve minimize sum(obj_func);
 
-%ann: search_ann;
-%search_ann = int_search(paths, dom_w_deg, indomain_min);
-array[COURIERS] of var int: courier_distances;
-constraint forall(c in COURIERS) (courier_distances[c] = sum(p in 1..(n-(m-1)+1))(distances[paths[c,p],paths[c,p+1]]));
-array[1..1,1..2] of var int: res = [| max(courier_distances), sum(c in COURIERS)(sum(p in 1..(n-(m-1)+1))(distances[paths[c,p],paths[c,p+1]]))|];
-solve minimize sum(res);
-
-output ["Distance done: \(result)\n"];
+%OUTPUT DEFINITION:
+output ["Distance done: \(total_distance)\n"];
 output ["Courier paths: \n"] ++ [
     show([paths[c, p] | p in PATH where paths[c, p] < n+1]) ++ "\n" | c in COURIERS
 ];
-%output ["size: \(c1_size)\n"];
 
 
 
