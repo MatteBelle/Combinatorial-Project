@@ -34,13 +34,15 @@ constraint forall(i in ITEMS)(
     sizes[i] > 0);  %Each item has a size sj
 constraint all_different_except(paths[COURIERS,PATH],{n+1}); %Each item is delivered at most by one courier, only n+1 value can be repeated as it's used as a filler element
 constraint forall(c in COURIERS) (
+   forall(p in 2..(n-(m-1)))(
+    if paths[c,p]==n+1 then paths[c,p+1]=n+1 else true endif)); %Put non-filler elements at path start and fill the rest
+constraint forall(c in COURIERS) (
   paths[c,1] = n+1 /\ paths[c,(n-(m-1)+2)]=n+1); %First element and last element in path is the origin (n+1)
 constraint matrix_total = matrix_empty_total - items_total; %Each item distrib_point must be present in the path matrix
 constraint forall(c in COURIERS) (
   sum(p in PATH)(paths[c,p]) < row_empty); %Each courier must deliver atleast one item
 constraint forall(c in COURIERS) (
   sum(p in PATH where paths[c,p]<n+1)(sizes[paths[c,p]]) <= load_sizes[c]); %Each courier's items sizes must not excede his load size
-var int: c1_size = sum(p in PATH where paths[1,p]<n+1)(sizes[paths[1,p]]); %remove
 constraint forall(c in COURIERS) (courier_distances[c] = sum(p in 1..(n-(m-1)+1))(distances[paths[c,p],paths[c,p+1]])); 
 %Each cuourier distance is given by the sum of the single distances between distib_points and origin point
 
@@ -48,8 +50,14 @@ solve minimize sum(obj_func);
 
 %OUTPUT DEFINITION:
 output ["Distance done: \(total_distance)\n"];
+output ["Single courier distance: \n"] ++ [
+    show(courier_distances[c]) ++ "\n" | c in COURIERS
+];
 output ["Courier paths: \n"] ++ [
     show([paths[c, p] | p in PATH where paths[c, p] < n+1]) ++ "\n" | c in COURIERS
+];
+output ["PROVA: \n"] ++ [
+    show([paths[c, p] | p in PATH]) ++ "\n" | c in COURIERS
 ];
 
 
