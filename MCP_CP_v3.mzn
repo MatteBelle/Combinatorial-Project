@@ -1,6 +1,6 @@
 include "globals.mzn";
 %VERSION NUMBER: 3 
-%To achieve a fair division among drivers, the objective is to minimize the maximum distance travelled by any courier. 
+% To achieve a fair division among drivers, the objective is to minimize the maximum distance travelled by any courier. 
 % EGALITARIAN BALANCING https://ceur-ws.org/Vol-3173/5.pdf
 % GRAPH-BASED APPROACH https://github.com/MiniZinc/minizinc-benchmarks/blob/master/cvrp/cvrp.mzn
 % THEORY BEHIND IT https://ozgurakgun.github.io/ModRef2017/files/ModRef2017_MTSP.pdf
@@ -104,7 +104,7 @@ constraint forall(i in START_ORIGIN_NODES) (
 );
 
 %constraint forall(c in COURIERS)(sum([load_at_node[j] | j in GRAPH_NODES where courier_per_item[j] = c])<=load_sizes[c]);
- % Check that partial load is always less or equal then the capacity for each vehicle.
+% Check that partial load is always less or equal then the capacity for each vehicle.
 constraint redundant_constraint(
     forall(i in ITEMS)(
         load_at_node[i] <= load_sizes[courier_per_item[i]]
@@ -118,8 +118,9 @@ constraint forall(c in COURIERS)(
 var int: total_distance = sum([distance_graph[i, successor[i]] | i in GRAPH_NODES]);
 array[COURIERS] of var int: distance_done_per_courier;
 constraint forall(c in COURIERS)(distance_done_per_courier[c] = sum([distance_graph[i, successor[i]] | i in GRAPH_NODES where courier_per_item[i] = c]));
-var int: z = max(distance_done_per_courier);
-constraint forall(c in COURIERS) (distance_done_per_courier[c] <= z);
+var int : z = max(distance_done_per_courier);
+%var int: obj_func = total_distance*2 + (z-min(distance_done_per_courier))*m;
+var int: obj_func = z;
 %array[COURIERS] of var int: courier_distances = [total_distance * (courier_per_item[i] == c) | i in GRAPH_NODES, c in COURIERS];
 %array[1..1,1..2] of var int: obj_func = [| (max(courier_distances) - min(courier_distances)), total_distance|]; 
 
@@ -128,13 +129,13 @@ solve :: seq_search([int_search(successor, dom_w_deg, indomain_random),
                int_search(courier_per_item, first_fail, indomain_random),
                int_search([load_at_node[j] | j in GRAPH_NODES], first_fail, indomain_min),
                int_search(distance_done_per_courier, first_fail, indomain_min),
-               relax_and_reconstruct(successor, 92), % 89, 92 have been used 
-               restart_luby(n*n)
+               restart_linear(n*n)
               ])   
-minimize z;
+minimize obj_func;
 
 output 
    [ "total_distance = "] ++ [show(total_distance)] ++
+   [ ";\ndistance_graph = "] ++ [show(distance_graph)] ++
    [ ";\nvehicle = " ] ++ [show(courier_per_item)]++
    [ ";\nsuccessor = "] ++ [show(successor)] ++
    [ ";\npredecessor = "] ++ [show(predecessor)] ++
