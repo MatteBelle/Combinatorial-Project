@@ -1,4 +1,6 @@
+
 # pdfs
+*.DS_Store
 *.pdf
 Instances/
 
