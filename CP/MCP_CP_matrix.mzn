@@ -66,9 +66,7 @@ output ["Single courier distance: \n"] ++ [
 output ["Courier paths: \n"] ++ [
     show([paths[c, p] | p in PATH where paths[c, p] < n+1]) ++ "\n" | c in COURIERS
 ];
-output ["PROVA: \n"] ++ [
-    show([paths[c, p] | p in PATH]) ++ "\n" | c in COURIERS
-];
+
 
 
 
