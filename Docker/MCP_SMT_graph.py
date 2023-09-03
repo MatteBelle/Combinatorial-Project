@@ -1,6 +1,5 @@
 from z3 import * # The Z3 Theorem Prover
 import numpy as np # Numpy for matrix operations
-import matplotlib.pyplot as plt # Matplotlib for plotting
 import sys
 # open the file in Instances folder
 # receive instance number from command line argument
