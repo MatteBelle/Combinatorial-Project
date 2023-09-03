@@ -21,13 +21,8 @@ for i in range(n+1):
     distance.append([int(x) for x in f.readline().split()])
 # close the file
 f.close()
-print("couriers:", m)
-print("items:", n)
-print("load_size:", load_size)
-print("item_size:", item_size)
 # output the distance matrix as a numpy array
 distance = np.array(distance)
-print("distance:\n", distance)
 max_path_length = n-(m-1)
 paths = [[Int("p_%s_%s" % (i,j)) for j in range(max_path_length)] for i in range(m)] 
 # create a matrix of mxn boolean variables for the assignment of items to couriers
