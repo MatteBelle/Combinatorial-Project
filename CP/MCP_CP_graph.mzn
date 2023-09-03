@@ -163,8 +163,10 @@ minimize obj_func;
 
 output 
    [show(obj_func)] ++   
-   [ ";"] ++ [show(m)] ++ 
-   [ ";"] ++ [show(n)] ++ 
-   [ ";"] ++ [show(successor)] ++ 
-   [ "\n"]
+   [ "-"] ++ [show(m)] ++ 
+   [ "-"] ++ [show(n)] ++ 
+   [ "-'"]
+;
+output
+  [show([successor[i] | i in GRAPH_NODES])] ++ ["'"]
 ;
