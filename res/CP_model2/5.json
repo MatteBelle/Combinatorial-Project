@@ -1,5 +1,5 @@
 {
-    "gecode": {"time": 0.338, "optimal": true, "obj": 206, "sol": [[2], [1, 3]]},
+    "gecode": {"time": 0.306, "optimal": true, "obj": 206, "sol": [[2], [1, 3]]},
     "chuffed": {"time": 0.348, "optimal": true, "obj": 206, "sol": [[2], [1, 3]]},
     "gecode-symmetry": {"time": 0.329, "optimal": true, "obj": 206, "sol": [[2], [1, 3]]},
     "chuffed-symmetry": {"time": 0.351, "optimal": true, "obj": 206, "sol": [[2], [1, 3]]}
