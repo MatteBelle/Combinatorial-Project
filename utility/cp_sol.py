@@ -1,3 +1,17 @@
+import sys
+
+to_split = sys.argv[1]
+# split the string into a list of strings, separated by -
+split = to_split.split('-')
+# get the number of couriers
+obj_val = split[0]
+# get the number of cuuriers
+m = split[1]
+# get the number of nodes
+n = split[2]
+# get the successor list
+successor = split[3]
+
 def get_path(successor, n, m):
     paths_per_courier = [[] for _ in range(m)]
     for c in range(1, m+2):
@@ -14,3 +28,4 @@ successor = [78, 41, 175, 135, 16, 102, 124, 107, 83, 168, 58, 36, 64, 103, 40, 
 
 get_path(successor, n, m)
 
+get_path(successor, n, m)
