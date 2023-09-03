@@ -1,6 +1,6 @@
 {
-    "gecode": {"time": 0.466, "optimal": true, "obj": 12, "sol": [[3, 5, 6], [2, 4], [1, 7]]},
-    "chuffed": {"time": 0.435, "optimal": true, "obj": 12, "sol": [[2, 4, 5], [3, 7], [1, 6]]},
-    "gecode-symmetry": {"time": 0.395, "optimal": true, "obj": 12, "sol": [[2, 4, 5], [3, 7], [1, 6]]},
-    "chuffed-symmetry": {"time": 0.428, "optimal": true, "obj": 12, "sol": [[2, 4, 5], [3, 7], [1, 6]]}
+    "gecode": {"time": 0.466, "optimal": true, "obj": 12, "sol": [[5, 6, 3], [4, 2], [7, 1]]},
+    "chuffed": {"time": 0.435, "optimal": true, "obj": 12, "sol": [[5, 4, 2], [3, 7], [1, 6]]},
+    "gecode-symmetry": {"time": 0.395, "optimal": true, "obj": 12, "sol": [[3, 6, 5], [4, 2], [7, 1]]},
+    "chuffed-symmetry": {"time": 0.428, "optimal": true, "obj": 12, "sol": [[5, 4, 2], [3, 7], [1, 6]]}
 }

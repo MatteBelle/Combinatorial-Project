@@ -24,10 +24,10 @@ set of int: END_ORIGIN_NODES = (n+m+1)..(n+m*2);
 %Tour representation
 array[GRAPH_NODES, GRAPH_NODES] of int: distance_graph = array2d(GRAPH_NODES, GRAPH_NODES,
         [if i <= n /\ j <= n then distances[i, j] % Distance between items based on the distances array
-         elseif i <= n /\ j in ORIGIN_NODES then distances[i, n+1] % Distance from an item to courier origin
-         elseif i in ORIGIN_NODES /\ j <= n then distances[n + 1, j] % Distance from courier origin to an item
+         elseif i <= n /\ j in ORIGIN_NODES then distances[n+1, i] % Distance from an item to courier origin
+         elseif i in ORIGIN_NODES /\ j <= n then distances[j, n+1] % Distance from courier origin to an item
          elseif i in ORIGIN_NODES /\ j in ORIGIN_NODES then 0 % Distance between courier origin points is 0
-         else 0 % Default value for other cases
+         else distances[n+1,n+1] % Default value for other cases
          endif | i, j in GRAPH_NODES]);
 
 array[GRAPH_NODES] of var GRAPH_NODES: successor;
@@ -80,6 +80,13 @@ constraint redundant_constraint(forall(i in GRAPH_NODES) (
   successor[predecessor[i]] = i
   )
 );
+
+constraint redundant_constraint(
+   forall(i in GRAPH_NODES) (
+      predecessor[successor[i]] = i
+   )
+);
+
 % Subtour elimination 
 constraint circuit(successor);
 constraint redundant_constraint(circuit(predecessor));
@@ -141,8 +148,8 @@ var int: obj_func = z;
 solve :: seq_search([int_search(successor, dom_w_deg, indomain_random),
                int_search(predecessor, dom_w_deg, indomain_random),
                int_search(courier_per_item, first_fail, indomain_random),
-               int_search([load_at_node[j] | j in GRAPH_NODES], first_fail, indomain_min),
-               int_search(distance_done_per_courier, first_fail, indomain_min),
+               int_search(load_at_node, first_fail, indomain_min),
+               %int_search(distance_done_per_courier, first_fail, indomain_min),
                restart_luby(n*n)
               ])
 % solve :: seq_search([int_search(successor, input_order, indomain_min),
@@ -155,9 +162,9 @@ solve :: seq_search([int_search(successor, dom_w_deg, indomain_random),
 minimize obj_func;
 
 output 
-   [ ";\nObjective = "] ++ [show(max(distance_done_per_courier))] ++   
+   [show(obj_func)] ++   
+   [ ";"] ++ [show(m)] ++ 
+   [ ";"] ++ [show(n)] ++ 
+   [ ";"] ++ [show(successor)] ++ 
    [ "\n"]
 ;
-output ["Courier paths: \n"] ++ [
-    show([i | i in ITEMS where courier_per_item[i] = c]) ++ ", " | c in COURIERS
-];
