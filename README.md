@@ -12,7 +12,7 @@ Run python libraries install script:
 ./install_script.sh
 
 To run SMT and MIP:
-cd SMT/ or cd MIP 
+cd Docker/ 
 python3 "Name of the model you want to run"
 
 To run CP:
