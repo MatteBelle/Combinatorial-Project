@@ -21,4 +21,4 @@ To run CP:
    minizinc --solver "Name of the solver you want to run" "Name of the model you want to run" "Data file you want to use"
 2) graph model:
    cd CP/
-   ./
+   ./run_graph.sh "number of the data instance like 01"
