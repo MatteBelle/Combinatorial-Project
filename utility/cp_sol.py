@@ -19,7 +19,8 @@ def get_path(successor, n, m):
         while x <= n:
             paths_per_courier[c-1].append(x)
             x = successor[x-1]
-    print(paths_per_courier)
+    print("Objective function value: ", obj_val)
+    print("Paths:", paths_per_courier)
 
 # convert each string to an integer
 obj_val = int(obj_val)
