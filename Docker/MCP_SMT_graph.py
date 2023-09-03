@@ -5,7 +5,7 @@ import sys
 # receive instance number from command line argument
 instance = sys.argv[1]
 # open the file in Instances folder
-f = open("./../Instances/inst{instance}.dat", "r")
+f = open(f"./../Instances/inst{instance}.dat", "r")
 # the first line is the number of couriers
 m = int(f.readline())
 # the second line is the number of items
