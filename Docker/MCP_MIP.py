@@ -96,7 +96,6 @@ def solve_courier_problem(courier_capacities, item_sizes, item_distances):
             for j in range(num_items + 1):
                 print(int(u[i][j].solution_value()), end=' ')
             print()
-        print(item_distances)
     else:
         print('The problem does not have an optimal solution.')
 
