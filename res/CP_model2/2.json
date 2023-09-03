@@ -1,0 +1,6 @@
+{
+    "gecode": {"time": 300, "optimal": false, "obj": 226, "sol": [[8], [1, 4], [6], [2, 7], [3, 5], [9]]},
+    "chuffed": {"time": 300, "optimal": false, "obj": 226, "sol": [[2, 3], [1, 4], [6], [5, 7], [8], [9]]},
+    "gecode-symmetry": {"time": 300, "optimal": false, "obj": 226, "sol": [[2, 7], [6, 8], [5], [3, 9], [4], [1]]},
+    "chuffed-symmetry": {"time": 300, "optimal": false, "obj": 226, "sol": [[2, 3], [1, 4], [6], [5, 7], [8], [9]]}
+}

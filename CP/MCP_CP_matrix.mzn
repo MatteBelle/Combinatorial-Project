@@ -48,9 +48,14 @@ constraint forall(c in COURIERS) (courier_distances[c] = sum(p in 1..(n-(m-1)+1)
 constraint forall(c in COURIERS)(alldifferent_except(paths[c, 1..max_path_length], {n+1}));
 
 solve 
+% GECODE
 :: seq_search([int_search(paths, dom_w_deg, indomain_min),
                restart_linear(n*n)
               ]) 
+% CHUFFED
+% :: seq_search([int_search(paths, input_order, indomain_min),
+%                restart_linear(n*n)
+%               ]) 
 minimize obj_func;
 
 %OUTPUT DEFINITION:

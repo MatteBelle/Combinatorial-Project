@@ -114,13 +114,27 @@ constraint redundant_constraint(
 constraint forall(c in COURIERS)(
     load_at_node[c+n+m] <= load_sizes[c]
 );
+
+% SYMMETRY BREAKING
+% Define variables for node ordering
+% array[1..n] of var 1..n: node_order;
+
+% % Symmetry-breaking constraint to enforce node ordering with lex
+% constraint lex_less(node_order, [successor[i] | i in 1..n]);
+
+% % Define variables for vehicle assignments
+% array[1..n] of var COURIERS: vehicle_assignment;
+
+% % Symmetry-breaking constraint to enforce vehicle assignment with lex
+% constraint lex_less([vehicle_assignment[i] | i in 1..n], [vehicle_assignment[i] | i in 2..n]);
+
 % Objective to minimize
 var int: total_distance = sum([distance_graph[i, successor[i]] | i in GRAPH_NODES]);
 array[COURIERS] of var int: distance_done_per_courier;
 constraint forall(c in COURIERS)(distance_done_per_courier[c] = sum([distance_graph[i, successor[i]] | i in GRAPH_NODES where courier_per_item[i] = c]));
 var int : z = max(distance_done_per_courier);
-%var int: obj_func = total_distance*2 + (z-min(distance_done_per_courier))*m;
 var int: obj_func = z;
+%var int: obj_func = total_distance*2 + (z-min(distance_done_per_courier))*m;
 %array[COURIERS] of var int: courier_distances = [total_distance * (courier_per_item[i] == c) | i in GRAPH_NODES, c in COURIERS];
 %array[1..1,1..2] of var int: obj_func = [| (max(courier_distances) - min(courier_distances)), total_distance|]; 
 
@@ -129,20 +143,21 @@ solve :: seq_search([int_search(successor, dom_w_deg, indomain_random),
                int_search(courier_per_item, first_fail, indomain_random),
                int_search([load_at_node[j] | j in GRAPH_NODES], first_fail, indomain_min),
                int_search(distance_done_per_courier, first_fail, indomain_min),
-               restart_linear(n*n)
-              ])   
+               restart_luby(n*n)
+              ])
+% solve :: seq_search([int_search(successor, input_order, indomain_min),
+%                int_search(predecessor, input_order, indomain_min),
+%                int_search(courier_per_item, first_fail, indomain_min),
+%                int_search([load_at_node[j] | j in GRAPH_NODES], first_fail, indomain_min),
+%                int_search(distance_done_per_courier, first_fail, indomain_min),
+%                restart_luby(n*n)
+%               ])    
 minimize obj_func;
 
 output 
-   [ "total_distance = "] ++ [show(total_distance)] ++
-   [ ";\ndistance_graph = "] ++ [show(distance_graph)] ++
-   [ ";\nvehicle = " ] ++ [show(courier_per_item)]++
-   [ ";\nsuccessor = "] ++ [show(successor)] ++
-   [ ";\npredecessor = "] ++ [show(predecessor)] ++
-   [ ";\nload = "] ++ [show(load_at_node)] ++
-   [ ";\ndistance done by couriers= "] ++ [show(distance_done_per_courier)] ++  
-   [ ";\n"]
+   [ ";\nObjective = "] ++ [show(max(distance_done_per_courier))] ++   
+   [ "\n"]
 ;
 output ["Courier paths: \n"] ++ [
-    show([i | i in ITEMS where courier_per_item[i] = c]) ++ "\n" | c in COURIERS
+    show([i | i in ITEMS where courier_per_item[i] = c]) ++ ", " | c in COURIERS
 ];
